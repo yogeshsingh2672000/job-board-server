@@ -20,7 +20,9 @@ app.get("/api/jobs", async (req, res) => {
   console.log("/api/jobs");
   const { keyword } = req.query;
 
-  const apiUrl = `https://www.reed.co.uk/api/1.0/search?keywords=${keyword}`;
+  const apiUrl = `https://www.reed.co.uk/api/1.0/search?keywords=${
+    !keyword ? "software" : keyword
+  }`;
 
   try {
     const base64Credentials = btoa(`${username}:${password}`);

@@ -1,8 +1,9 @@
-const express = require("express");
-const cors = require("cors");
-const btoa = require("btoa");
-require("dotenv").config();
-const fetch = require("node-fetch");
+import express from "express";
+import cors from "cors";
+import { config } from "dotenv";
+import fetch from "node-fetch";
+
+config(); // Load environment variables from .env file
 
 const app = express();
 const port = 3005;
@@ -26,7 +27,9 @@ app.get("/api/jobs", async (req, res) => {
   }`;
 
   try {
-    const base64Credentials = btoa(`${username}:${password}`);
+    const base64Credentials = Buffer.from(`${username}:${password}`).toString(
+      "base64"
+    );
     const response = await fetch(apiUrl, {
       method: "GET",
       headers: {
@@ -49,7 +52,9 @@ app.get("/api/job/:id", async (req, res) => {
   const apiUrl = `https://www.reed.co.uk/api/1.0/jobs/${id}`;
 
   try {
-    const base64Credentials = btoa(`${username}:${password}`);
+    const base64Credentials = Buffer.from(`${username}:${password}`).toString(
+      "base64"
+    );
     const response = await fetch(apiUrl, {
       method: "GET",
       headers: {
@@ -58,7 +63,7 @@ app.get("/api/job/:id", async (req, res) => {
       },
     });
     const data = await response.json();
-    console.log("respose sent");
+    console.log("response sent");
     res.json(data);
   } catch (error) {
     console.log("Error while making request", error.message);

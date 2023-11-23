@@ -38,6 +38,7 @@ app.get("/api/jobs", async (req, res) => {
       },
     });
     const data = await response.json();
+    console.log("response sent");
     res.json(data.results);
   } catch (error) {
     console.log("Error while making request", error);

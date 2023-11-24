@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
-import fetch from "node-fetch";
+import { getAllJobs, getJob } from "./controllers/jobController.js";
 
 config(); // Load environment variables from .env file
 
@@ -9,66 +9,31 @@ const app = express();
 const port = 3005;
 
 app.use(express.json());
-app.use(cors());
 
-const username = process.env.REACT_APP_API_KEY;
-const password = "";
+const whitelist = [
+  "https://job-board-lemon.vercel.app",
+  "http://localhost:3005",
+];
 
-app.get("/", async (req, res) => {
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Check if the request origin is in the whitelist
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
+
+app.get("/", (req, res) => {
   res.send("working");
 });
 
-app.get("/api/jobs", async (req, res) => {
-  console.log("/api/jobs");
-  const { keyword } = req.query;
-
-  const apiUrl = `https://www.reed.co.uk/api/1.0/search?keywords=${
-    !keyword ? "software" : keyword
-  }`;
-
-  try {
-    const base64Credentials = Buffer.from(`${username}:${password}`).toString(
-      "base64"
-    );
-    const response = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${base64Credentials}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    console.log("response sent");
-    res.json(data.results);
-  } catch (error) {
-    console.log("Error while making request", error);
-  }
-});
-
-app.get("/api/job/:id", async (req, res) => {
-  console.log("/api/job/:id");
-  const { id } = req.params;
-
-  const apiUrl = `https://www.reed.co.uk/api/1.0/jobs/${id}`;
-
-  try {
-    const base64Credentials = Buffer.from(`${username}:${password}`).toString(
-      "base64"
-    );
-    const response = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${base64Credentials}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    console.log("response sent");
-    res.json(data);
-  } catch (error) {
-    console.log("Error while making request", error.message);
-  }
-});
+app.get("/api/jobs", getAllJobs);
+app.get("/api/job/:id", getJob);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

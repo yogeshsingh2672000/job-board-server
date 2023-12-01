@@ -12,7 +12,7 @@ app.use(express.json());
 
 const whitelist = [
   "https://job-board-lemon.vercel.app",
-  "http://localhost:3005",
+  "http://localhost:3000",
 ];
 
 const corsOptions = {
